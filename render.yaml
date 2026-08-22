@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: qversity-cicd-staging
+    runtime: python
+    plan: free
+    branch: develop
+    autoDeploy: false
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+
+  - type: web
+    name: qversity-cicd-prod
+    runtime: python
+    plan: free
+    branch: main
+    autoDeploy: false
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: "3.12.4"
