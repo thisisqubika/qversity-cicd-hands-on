@@ -46,6 +46,23 @@ def create_app():
 
         return jsonify(error="item not found"), 404
 
+    @app.patch("/items/<int:item_id>")
+    def update_item(item_id):
+        data = request.get_json(silent=True)
+        if not data or "name" not in data:
+            return jsonify(error="name is required"), 400
+
+        name = data["name"]
+        if not isinstance(name, str) or not name.strip():
+            return jsonify(error="name must be a non-empty string"), 400
+
+        for item in items:
+            if item["id"] == item_id:
+                item["name"] = name.strip()
+                return jsonify(item=item)
+
+        return jsonify(error="item not found"), 404
+
     return app
 
 

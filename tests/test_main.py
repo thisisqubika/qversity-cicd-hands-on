@@ -97,3 +97,48 @@ def test_delete_item_returns_404_for_unknown_id():
 
     assert response.status_code == 404
     assert response.get_json() == {"error": "item not found"}
+
+
+def test_update_item_returns_200_with_updated_item():
+    client = create_app().test_client()
+
+    response = client.patch("/items/1", json={"name": "sprocket"})
+
+    assert response.status_code == 200
+    assert response.get_json() == {"item": {"id": 1, "name": "sprocket"}}
+
+
+def test_update_item_is_visible_on_get_items():
+    client = create_app().test_client()
+
+    client.patch("/items/1", json={"name": "sprocket"})
+    response = client.get("/items")
+
+    assert response.get_json()["items"][0] == {"id": 1, "name": "sprocket"}
+
+
+def test_update_item_rejects_missing_name():
+    client = create_app().test_client()
+
+    response = client.patch("/items/1", json={})
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "name is required"}
+
+
+def test_update_item_rejects_empty_name():
+    client = create_app().test_client()
+
+    response = client.patch("/items/1", json={"name": "   "})
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "name must be a non-empty string"}
+
+
+def test_update_item_returns_404_for_unknown_id():
+    client = create_app().test_client()
+
+    response = client.patch("/items/999", json={"name": "sprocket"})
+
+    assert response.status_code == 404
+    assert response.get_json() == {"error": "item not found"}
