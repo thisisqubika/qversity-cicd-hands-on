@@ -70,3 +70,30 @@ def test_create_item_rejects_empty_name():
 
     assert response.status_code == 400
     assert response.get_json() == {"error": "name must be a non-empty string"}
+
+
+def test_delete_item_returns_200_with_deleted_item():
+    client = create_app().test_client()
+
+    response = client.delete("/items/1")
+
+    assert response.status_code == 200
+    assert response.get_json() == {"item": {"id": 1, "name": "widget"}}
+
+
+def test_delete_item_removes_it_from_get_items():
+    client = create_app().test_client()
+
+    client.delete("/items/1")
+    response = client.get("/items")
+
+    assert response.get_json() == {"items": [{"id": 2, "name": "gadget"}]}
+
+
+def test_delete_item_returns_404_for_unknown_id():
+    client = create_app().test_client()
+
+    response = client.delete("/items/999")
+
+    assert response.status_code == 404
+    assert response.get_json() == {"error": "item not found"}
