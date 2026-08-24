@@ -37,6 +37,15 @@ def create_app():
         items.append(item)
         return jsonify(item=item), 201
 
+    @app.delete("/items/<int:item_id>")
+    def delete_item(item_id):
+        for index, item in enumerate(items):
+            if item["id"] == item_id:
+                items.pop(index)
+                return jsonify(item=item)
+
+        return jsonify(error="item not found"), 404
+
     return app
 
 
