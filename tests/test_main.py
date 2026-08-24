@@ -70,3 +70,48 @@ def test_create_item_rejects_empty_name():
 
     assert response.status_code == 400
     assert response.get_json() == {"error": "name must be a non-empty string"}
+
+
+def test_update_item_returns_200_with_updated_item():
+    client = create_app().test_client()
+
+    response = client.put("/items/1", json={"name": "renamed-widget"})
+
+    assert response.status_code == 200
+    assert response.get_json() == {"item": {"id": 1, "name": "renamed-widget"}}
+
+
+def test_update_item_is_visible_on_get_items():
+    client = create_app().test_client()
+
+    client.put("/items/2", json={"name": "renamed-gadget"})
+    response = client.get("/items")
+
+    assert response.get_json()["items"][1] == {"id": 2, "name": "renamed-gadget"}
+
+
+def test_update_item_rejects_missing_name():
+    client = create_app().test_client()
+
+    response = client.put("/items/1", json={})
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "name is required"}
+
+
+def test_update_item_rejects_empty_name():
+    client = create_app().test_client()
+
+    response = client.put("/items/1", json={"name": "   "})
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "name must be a non-empty string"}
+
+
+def test_update_item_returns_404_for_missing_item():
+    client = create_app().test_client()
+
+    response = client.put("/items/999", json={"name": "ghost"})
+
+    assert response.status_code == 404
+    assert response.get_json() == {"error": "item not found"}
