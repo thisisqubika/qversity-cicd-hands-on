@@ -142,3 +142,11 @@ def test_update_item_returns_404_for_unknown_id():
 
     assert response.status_code == 404
     assert response.get_json() == {"error": "item not found"}
+
+
+def test_items_seed_data_has_been_renamed_to_sprocket():
+    client = create_app().test_client()
+
+    response = client.get("/items")
+
+    assert response.get_json()["items"][0] == {"id": 1, "name": "sprocket"}
